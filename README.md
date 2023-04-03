@@ -16,7 +16,7 @@ which unfortunately no longer works. I promise that Protobowl bot will be mainta
 
 ## How to Run Protobowl Bot
 <ol>
-<li> Download this Github repo by clicking on the green `Code` button in the top right corner and selecting "Download as ZIP." </li>
+<li> Download this Github repo by clicking on the green <code>Code</code> button in the top right corner and selecting "Download as ZIP." </li>
 <li> Unzip/extract the archive and place it in your folder of choice. </li>
 <li> Install Python 3.9+ from whatever source you wish. Personally, I like <a href="https://www.anaconda.com/products/distribution" target="_blank">Anaconda</a>. </li>
 <li> Use your package manager of choice (<a href="https://pip.pypa.io/en/stable/cli/pip_download/" target="_blank">pip</a> is easiest) to install Selenium with <b>version 4.3.0+</b>. </li>
