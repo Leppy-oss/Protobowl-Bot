@@ -1,4 +1,6 @@
+from __future__ import annotations
 from actions.action import Action
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 class Click(Action):
@@ -10,3 +12,7 @@ class Click(Action):
 
     def click(self):
         self.run()
+
+    def bind_driver(self, driver: WebDriver) -> Click:
+        Action.bind_driver(self, driver)
+        return self
