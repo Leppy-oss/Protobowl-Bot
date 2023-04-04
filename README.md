@@ -30,4 +30,6 @@ which unfortunately no longer works. I promise that Protobowl bot will be mainta
 Will you get better at Quizbowl using this bot? *Probably not.* <br>
 Will you have fun using this bot? *Probably not.* <br>
 Will others get mad at you for using this bot? *Probably.* <br>
+**I made this bot as a side project in a day just for fun, not for any malicious intent. Please don't do anything immature or embarassing with this bot.**
+*I fully condemn any exploitative actions with this bot that harm anybody.* <br>
 ***USE THIS BOT AT YOUR OWN RISK!!!***
