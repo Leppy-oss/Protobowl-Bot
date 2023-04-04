@@ -12,7 +12,7 @@ from actions.click import Click
 driver = webdriver.Chrome()
 driver.get('https://protobowl.com/msquizbowl')
 
-name = 'Rappa Hosyckc'
+name = 'ostentatious foil'
 
 while not driver.find_element(By.ID, 'username').is_displayed():
     sleep(.1)  # wait for the page to load
@@ -28,9 +28,6 @@ btn = Click(driver.find_element(By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
 def buzz(text):
     guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')  # input
     print('Buzzing')
-    while not guess_input.is_enabled() and not btn.should_run():
-        print('not avialable')
-        continue
 
     sleep(0.5)  # let the guess box appear
     guess_input.send_keys(text + '\n')
@@ -104,15 +101,22 @@ print(btn.__repr__())
 prevqid = ''
 
 while True:
-    '''
-    btn.click()
-    if (btn.should_run()):
-        buzz("rock")
-    '''
     try:
         if get_knowledge(0)['qid'] != prevqid:
             guess: str = guess_answer(get_knowledge(0)['qid'])
             print(guess)
+            if guess != '':
+                sleep(0.5)
+                try:
+                    btn.click()
+                except:
+                    print('buzz failed')
+                sleep(0.5)
+                try:
+                    buzz(guess)
+                except Exception as e:
+                    print('guess failed: ' + str(e))
+
             try:
                 a = get_knowledge(1)
                 record_answer(a['qid'], a['answer'])
