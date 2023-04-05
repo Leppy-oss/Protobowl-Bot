@@ -31,11 +31,11 @@ should_quit = False
 
 caption = Label(root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
 caption.pack()
-nameInput = tk.Text(root, height=5, width=20)
+nameInput = tk.Text(root, height=1, width=10)
 tk.Label(root, text='Enter bot name here...').pack()
 nameInput.pack()
 tk.Label(root, text='Enter room name here...').pack()
-roomInput = tk.Text(root, height=5, width=20)
+roomInput = tk.Text(root, height=1, width=10)
 roomInput.pack()
 stop_label = tk.Label(root, text='Stopping...')
 
@@ -90,6 +90,7 @@ def buzz(guess):
 
     guess_input.send_keys('\n')
     sleep(0.5)  # let the guess box appear
+    streak += 1
 
 
 def get_knowledge(i):
@@ -171,7 +172,7 @@ while is_botting and not should_quit:
                 try:
                     sleep(0.5)
                     skipbtn.click()
-                    print('skipped')
+                    print('attempted to skip')
                 except Exception as e:
                     print('couldnt skip rip: ' + str(e))
 
