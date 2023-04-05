@@ -29,7 +29,8 @@ skipbtn = None
 is_botting = False
 should_quit = False
 
-caption = Label(root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
+caption = Label(
+    root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
 caption.pack()
 nameInput = tk.Text(root, height=1, width=10)
 tk.Label(root, text='Enter bot name here...').pack()
@@ -39,24 +40,31 @@ roomInput = tk.Text(root, height=1, width=10)
 roomInput.pack()
 stop_label = tk.Label(root, text='Stopping...')
 
+
 def launch_bot():
     global is_botting, driver, buzzbtn, nextbtn, skipbtn, nameInput, roomInput
     if not is_botting:
         is_botting = True
         driver = webdriver.Chrome()
-        driver.get('https://protobowl.com/' + str(roomInput.get(1.0, 'end-1c')))
+        driver.get('https://protobowl.com/' +
+                   str(roomInput.get(1.0, 'end-1c')))
         while not driver.find_element(By.ID, 'username').is_displayed():
             sleep(.1)  # wait for the page to load
 
         # set name
-        username = driver.find_element(By.ID, 'username')  # find the username box
+        username = driver.find_element(
+            By.ID, 'username')  # find the username box
         username.clear()
         username.send_keys(str(nameInput.get(1.0, 'end-1c')) + Keys.RETURN)
 
         # initialize buttons
-        buzzbtn = Click(driver.find_element(By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
-        nextbtn = Click(driver.find_element(By.CLASS_NAME, 'nextbtn')).bind_driver(driver)
-        skipbtn = Click(driver.find_element(By.CLASS_NAME, 'skipbtn')).bind_driver(driver)
+        buzzbtn = Click(driver.find_element(
+            By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
+        nextbtn = Click(driver.find_element(
+            By.CLASS_NAME, 'nextbtn')).bind_driver(driver)
+        skipbtn = Click(driver.find_element(
+            By.CLASS_NAME, 'skipbtn')).bind_driver(driver)
+
 
 def stop_bot():
     global is_botting, driver, should_quit
@@ -68,10 +76,12 @@ def stop_bot():
     should_quit = True
     quit()
 
+
 start_btn = Button(root, text='LAUNCH BOT', command=launch_bot)
 start_btn.pack()
 stop_btn = Button(root, text='STOP BOT', command=stop_bot)
 stop_btn.pack()
+
 
 def buzz(guess):
     guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')  # input
@@ -82,15 +92,15 @@ def buzz(guess):
         print('waiting for the text field to become available')
     '''
 
-    sleep(0.5)  # let the guess box appear
+    sleep(1)  # let the guess box appear
     splits = natural.naturalized_splits(guess)
+    print('initialized splits')
     for split in splits:
         guess_input.send_keys(split[0])
         sleep(split[1])
 
     guess_input.send_keys('\n')
     sleep(0.5)  # let the guess box appear
-    streak += 1
 
 
 def get_knowledge(i):
@@ -140,6 +150,7 @@ def write_out(filename, object=knowledge):
         # keys sorted to reduce deltas in our version control system
         json.dump(object, f, sort_keys=True)
 
+
 prevqid = ''
 
 while not is_botting and not should_quit:
@@ -158,14 +169,15 @@ while is_botting and not should_quit:
             guess: str = guess_answer(got_knowledge['qid'])
             print(guess)
             if guess != '':
-                sleep(0.5)
+                # sleep(0.5)
                 try:
                     buzzbtn.click()
                 except:
                     print('buzz failed')
                 sleep(random.random())
                 try:
-                    buzz(natural.naturalize_guess(guess.lower().translate(str.maketrans('', '', string.punctuation))))
+                    buzz(natural.naturalize_guess(guess.lower().translate(
+                        str.maketrans('', '', string.punctuation))))
                 except Exception as e:
                     print('guess failed: ' + str(e))
             else:
