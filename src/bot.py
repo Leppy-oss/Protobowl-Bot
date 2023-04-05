@@ -2,35 +2,93 @@ import json
 import unicodedata
 import selenium
 from selenium import webdriver
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
 from actions.click import Click
+from util import natural
+import random
+import string
+import tkinter as tk
+from tkinter import *
 
-driver = webdriver.Chrome()
-driver.get('https://protobowl.com/msquizbowl')
+driver = None
 
-name = 'ostentatious foil'
+name = ''
+root = tk.Tk()
+root.title('Protobowl Bot Interface')
+root.geometry('400x400')
 
-while not driver.find_element(By.ID, 'username').is_displayed():
-    sleep(.1)  # wait for the page to load
+buzzbtn = None
+nextbtn = None
+skipbtn = None
 
-# set name
-username = driver.find_element(By.ID, 'username')  # find the username box
-username.clear()
-username.send_keys(name + Keys.RETURN)
+is_botting = False
+should_quit = False
 
-btn = Click(driver.find_element(By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
+caption = Label(root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
+caption.pack()
+nameInput = tk.Text(root, height=5, width=20)
+tk.Label(root, text='Enter bot name here...').pack()
+nameInput.pack()
+tk.Label(root, text='Enter room name here...').pack()
+roomInput = tk.Text(root, height=5, width=20)
+roomInput.pack()
+stop_label = tk.Label(root, text='Stopping...')
 
+def launch_bot():
+    global is_botting, driver, buzzbtn, nextbtn, skipbtn, nameInput, roomInput
+    if not is_botting:
+        is_botting = True
+        driver = webdriver.Chrome()
+        driver.get('https://protobowl.com/' + str(roomInput.get(1.0, 'end-1c')))
+        while not driver.find_element(By.ID, 'username').is_displayed():
+            sleep(.1)  # wait for the page to load
 
-def buzz(text):
+        # set name
+        username = driver.find_element(By.ID, 'username')  # find the username box
+        username.clear()
+        username.send_keys(str(nameInput.get(1.0, 'end-1c')) + Keys.RETURN)
+
+        # initialize buttons
+        buzzbtn = Click(driver.find_element(By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
+        nextbtn = Click(driver.find_element(By.CLASS_NAME, 'nextbtn')).bind_driver(driver)
+        skipbtn = Click(driver.find_element(By.CLASS_NAME, 'skipbtn')).bind_driver(driver)
+
+def stop_bot():
+    global is_botting, driver, should_quit
+    if is_botting:
+        is_botting = False
+        driver.close()
+    stop_label.pack()
+    root.destroy()
+    should_quit = True
+    quit()
+
+start_btn = Button(root, text='LAUNCH BOT', command=launch_bot)
+start_btn.pack()
+stop_btn = Button(root, text='STOP BOT', command=stop_bot)
+stop_btn.pack()
+
+def buzz(guess):
     guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')  # input
     print('Buzzing')
 
+    '''
+    while not (guess_input.is_displayed()):
+        print('waiting for the text field to become available')
+    '''
+
     sleep(0.5)  # let the guess box appear
-    guess_input.send_keys(text + '\n')
+    splits = natural.naturalized_splits(guess)
+    for split in splits:
+        guess_input.send_keys(split[0])
+        sleep(split[1])
+
+    guess_input.send_keys('\n')
     sleep(0.5)  # let the guess box appear
 
 
@@ -53,21 +111,6 @@ def get_knowledge(i):
     else:
         answer = ''
     return {'qid': qid, 'answer': answer}
-
-
-def get_raw_breadcrumb(i):
-    return driver.find_elements(By.CLASS_NAME, 'breadcrumb')[i].text
-
-
-def get_breadcrumb(i):
-    return get_raw_breadcrumb(i).split("/Edit\n")[0]
-
-
-def get_answer(i):
-    if i > 0:
-        return get_raw_breadcrumb(i).split("/Edit\n")[1]
-    else:
-        return ''
 
 
 knowledge = {}
@@ -96,26 +139,41 @@ def write_out(filename, object=knowledge):
         # keys sorted to reduce deltas in our version control system
         json.dump(object, f, sort_keys=True)
 
-
-print(btn.__repr__())
 prevqid = ''
 
-while True:
+while not is_botting and not should_quit:
+    root.update()
+
+while is_botting and not should_quit:
     try:
-        if get_knowledge(0)['qid'] != prevqid:
-            guess: str = guess_answer(get_knowledge(0)['qid'])
+        try:
+            nextbtn.click()
+            sleep(0.5)
+        except:
+            pass
+        got_knowledge = get_knowledge(0)
+        if got_knowledge['qid'] != prevqid:
+            print('new question occurred')
+            guess: str = guess_answer(got_knowledge['qid'])
             print(guess)
             if guess != '':
                 sleep(0.5)
                 try:
-                    btn.click()
+                    buzzbtn.click()
                 except:
                     print('buzz failed')
-                sleep(0.5)
+                sleep(random.random())
                 try:
-                    buzz(guess)
+                    buzz(natural.naturalize_guess(guess.lower().translate(str.maketrans('', '', string.punctuation))))
                 except Exception as e:
                     print('guess failed: ' + str(e))
+            else:
+                try:
+                    sleep(0.5)
+                    skipbtn.click()
+                    print('skipped')
+                except Exception as e:
+                    print('couldnt skip rip: ' + str(e))
 
             try:
                 a = get_knowledge(1)
@@ -126,9 +184,11 @@ while True:
 
             write_out('../res/knowledge.json')
             print('knowledge now contains ' + str(len(knowledge)) + ' pairs')
-        prevqid = get_knowledge(0)['qid']
+        prevqid = got_knowledge['qid']
 
     except Exception as e:
-        print('error while getting knowledge: ' + str(e))
+        # print('bot operation failed: ' + str(e))
+        pass
 
-    sleep(.1)
+    root.update()
+    sleep(0.2)
