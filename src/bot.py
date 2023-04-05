@@ -92,11 +92,18 @@ def buzz(guess):
         print('waiting for the text field to become available')
     '''
 
-    sleep(1)  # let the guess box appear
+    # sleep(1)  # let the guess box appear
     splits = natural.naturalized_splits(guess)
     print('initialized splits')
     for split in splits:
-        guess_input.send_keys(split[0])
+        type_successful = False
+        while not type_successful:
+            try:
+                guess_input.send_keys(split[0])
+                type_successful = True
+            except:
+                continue
+
         sleep(split[1])
 
     guess_input.send_keys('\n')

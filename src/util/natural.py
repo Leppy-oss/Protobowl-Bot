@@ -91,8 +91,3 @@ def clip(x, min, max):
     elif x > max:
         return max
     return x
-
-
-for i in range(0, 100):
-    print(naturalized_splits(naturalize_guess(
-        'on the ceiling of the sistine chapel')))
