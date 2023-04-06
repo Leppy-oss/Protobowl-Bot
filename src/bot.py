@@ -39,7 +39,7 @@ tk.Label(root, text='Enter room name here...').pack()
 roomInput = tk.Text(root, height=1, width=10)
 roomInput.pack()
 stop_label = tk.Label(root, text='Stopping...')
-
+should_natural = True
 
 def launch_bot():
     global is_botting, driver, buzzbtn, nextbtn, skipbtn, nameInput, roomInput
@@ -51,9 +51,7 @@ def launch_bot():
         while not driver.find_element(By.ID, 'username').is_displayed():
             sleep(.1)  # wait for the page to load
 
-        # set name
-        username = driver.find_element(
-            By.ID, 'username')  # find the username box
+        username = driver.find_element(By.ID, 'username')
         username.clear()
         username.send_keys(str(nameInput.get(1.0, 'end-1c')) + Keys.RETURN)
 
@@ -84,7 +82,7 @@ stop_btn.pack()
 
 
 def buzz(guess):
-    guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')  # input
+    guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')
     print('Buzzing')
 
     '''
@@ -92,40 +90,53 @@ def buzz(guess):
         print('waiting for the text field to become available')
     '''
 
-    # sleep(1)  # let the guess box appear
-    splits = natural.naturalized_splits(guess)
-    print('initialized splits')
-    for split in splits:
+    if should_natural:
+        sleep(random.randint(500, 1000) / 1000 * 1.25) # natural delay before typing
+    
+    else:
+        sleep(1)
+
+    if should_natural:
+        splits = natural.naturalized_splits(guess)
+        print('initialized splits')
+        for split in splits:
+            type_successful = False
+            while not type_successful:
+                try:
+                    buzzbtn.click()
+                    guess_input.send_keys(split[0])
+                    type_successful = True
+                except:
+                    continue
+
+            sleep(split[1])
+    else:
         type_successful = False
+        print('oloop prev')
         while not type_successful:
+            print('oloop ')
             try:
-                guess_input.send_keys(split[0])
+                guess_input.send_keys(guess)
                 type_successful = True
-            except:
+            except Exception as e:
+                print (e)
                 continue
 
-        sleep(split[1])
-
     guess_input.send_keys('\n')
-    sleep(0.5)  # let the guess box appear
-
 
 def get_knowledge(i):
     bundle = driver.find_elements(By.CLASS_NAME, 'bundle')[i]
     qid = bundle.get_attribute("class").split("qid-")[1].split(" ")[0]
-    if i > 0:  # this feels inelegant, but works
+    if i > 0: # only return a non-empty answer if it is a past question
         raw_breadcrumb = bundle.find_element(By.CLASS_NAME, 'breadcrumb').text
         answer = raw_breadcrumb.split("/Edit\n")[1]
         answer = unicodedata.normalize(
             'NFKD', answer).encode("ascii", "ignore").decode()
-        # get only the first part of the answer, not the parenthetical note
+        
+        # remove the parenthesised part of the answer
         answer = answer.split("(")[0]
-        # get only the first part of the answer, not the parenthetical note
         answer = answer.split("[")[0]
-        # strip whitespace characters from around the answer (presumably in between the parenthetical note and the real answer)
         answer = answer.strip()
-        answer = answer.strip(u"\u2018").strip(u"\u2019").strip(u"\u201c").strip(u"\u201d").strip("'").strip(
-            "\"")  # strip all quote marks, which occasionally cause Protobowl to reject correct answers
     else:
         answer = ''
     return {'qid': qid, 'answer': answer}
@@ -154,7 +165,6 @@ def record_answer(qid, answer):
 
 def write_out(filename, object=knowledge):
     with open(filename, 'w') as f:
-        # keys sorted to reduce deltas in our version control system
         json.dump(object, f, sort_keys=True)
 
 
@@ -167,7 +177,7 @@ while is_botting and not should_quit:
     try:
         try:
             nextbtn.click()
-            sleep(0.5)
+            sleep(0.2)
         except:
             pass
         got_knowledge = get_knowledge(0)
@@ -176,15 +186,19 @@ while is_botting and not should_quit:
             guess: str = guess_answer(got_knowledge['qid'])
             print(guess)
             if guess != '':
-                # sleep(0.5)
+                if should_natural:
+                    # sleep(random.randint(500, 1000) / 1000 * 0.5)
+                    pass
+
                 try:
                     buzzbtn.click()
                 except:
                     print('buzz failed')
-                sleep(random.random())
+
                 try:
-                    buzz(natural.naturalize_guess(guess.lower().translate(
-                        str.maketrans('', '', string.punctuation))))
+                    buzz(natural.naturalize_guess(guess.lower().replace('-', ' ').translate(
+                        str.maketrans('', '', string.punctuation))) if should_natural else guess.lower().replace('-', ' ').translate(
+                        str.maketrans('', '', string.punctuation)))
                 except Exception as e:
                     print('guess failed: ' + str(e))
             else:

@@ -7,7 +7,7 @@ from itertools import islice
 srand = random.random()
 random.seed(srand)
 
-k_mu_n_g = 0.25
+k_mu_n_g = 0.15
 k_sigma_n_g = 0.05
 cpm = 1000  # chars per minute of the bot's chunks
 t_buzz = 7  # seconds
@@ -22,7 +22,7 @@ def naturalize_guess(guess: str) -> str:
 
     for w in guess_split:
         w_l = list(w)
-        if len(w_l) > 3:
+        if len(w_l) > 6:
             i_all = [i for i, _ in enumerate(w_l)]
             # randomizing the first letter may result in Protobowl counting it wrong!
             i_all.pop(0)
