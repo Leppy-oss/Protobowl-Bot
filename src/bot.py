@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from time import sleep
+import time
 from actions.click import Click
 from util import natural
 import random
@@ -40,6 +41,7 @@ roomInput = tk.Text(root, height=1, width=10)
 roomInput.pack()
 stop_label = tk.Label(root, text='Stopping...')
 should_natural = True
+
 
 def launch_bot():
     global is_botting, driver, buzzbtn, nextbtn, skipbtn, nameInput, roomInput
@@ -91,23 +93,32 @@ def buzz(guess):
     '''
 
     if should_natural:
-        sleep(random.randint(500, 1000) / 1000 * 1.25) # natural delay before typing
-    
+        # natural delay before typing
+        # sleep(random.randint(500, 1000) / 1000 * 1.25)
+        pass
+
     else:
         sleep(1)
 
     if should_natural:
         splits = natural.naturalized_splits(guess)
+        start_time = time.time()
         print('initialized splits')
         for split in splits:
             type_successful = False
+            try:
+                guess_input.send_keys(split[0])
+            except:
+                continue
+            '''
             while not type_successful:
+                if time.time() - start_time > 5:
+                    break
                 try:
-                    buzzbtn.click()
-                    guess_input.send_keys(split[0])
                     type_successful = True
                 except:
                     continue
+            '''
 
             sleep(split[1])
     else:
@@ -116,23 +127,28 @@ def buzz(guess):
         while not type_successful:
             print('oloop ')
             try:
+                buzzbtn.click()
                 guess_input.send_keys(guess)
                 type_successful = True
             except Exception as e:
-                print (e)
+                print(e)
                 continue
 
-    guess_input.send_keys('\n')
+    try:
+        guess_input.send_keys('\n')
+    except:
+        pass
+
 
 def get_knowledge(i):
     bundle = driver.find_elements(By.CLASS_NAME, 'bundle')[i]
     qid = bundle.get_attribute("class").split("qid-")[1].split(" ")[0]
-    if i > 0: # only return a non-empty answer if it is a past question
+    if i > 0:  # only return a non-empty answer if it is a past question
         raw_breadcrumb = bundle.find_element(By.CLASS_NAME, 'breadcrumb').text
         answer = raw_breadcrumb.split("/Edit\n")[1]
         answer = unicodedata.normalize(
             'NFKD', answer).encode("ascii", "ignore").decode()
-        
+
         # remove the parenthesised part of the answer
         answer = answer.split("(")[0]
         answer = answer.split("[")[0]
@@ -177,7 +193,7 @@ while is_botting and not should_quit:
     try:
         try:
             nextbtn.click()
-            sleep(0.2)
+            # sleep(0.2)
         except:
             pass
         got_knowledge = get_knowledge(0)
@@ -191,11 +207,15 @@ while is_botting and not should_quit:
                     pass
 
                 try:
+                    sleep(0.25)
                     buzzbtn.click()
                 except:
                     print('buzz failed')
 
                 try:
+                    if should_natural:
+                        sleep(random.randint(500, 1000) / 1000 * 1.5)
+
                     buzz(natural.naturalize_guess(guess.lower().replace('-', ' ').translate(
                         str.maketrans('', '', string.punctuation))) if should_natural else guess.lower().replace('-', ' ').translate(
                         str.maketrans('', '', string.punctuation)))
@@ -225,4 +245,4 @@ while is_botting and not should_quit:
         pass
 
     root.update()
-    sleep(0.2)
+    # sleep(0.2)
