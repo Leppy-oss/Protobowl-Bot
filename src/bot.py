@@ -29,6 +29,7 @@ skipbtn = None
 
 is_botting = False
 should_quit = False
+rapid_launch = True
 
 caption = Label(
     root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
@@ -49,13 +50,14 @@ def launch_bot():
         is_botting = True
         driver = webdriver.Chrome()
         driver.get('https://protobowl.com/' +
-                   str(roomInput.get(1.0, 'end-1c')))
+                   (str(roomInput.get(1.0, 'end-1c')) if not rapid_launch else 'msquizbowl'))
         while not driver.find_element(By.ID, 'username').is_displayed():
             sleep(.1)  # wait for the page to load
 
         username = driver.find_element(By.ID, 'username')
         username.clear()
-        username.send_keys(str(nameInput.get(1.0, 'end-1c')) + Keys.RETURN)
+        username.send_keys((str(nameInput.get(1.0, 'end-1c'))
+                           if not rapid_launch else 'natty bot') + Keys.RETURN)
 
         # initialize buttons
         buzzbtn = Click(driver.find_element(
@@ -186,8 +188,11 @@ def write_out(filename, object=knowledge):
 
 prevqid = ''
 
-while not is_botting and not should_quit:
+while not is_botting and not should_quit and not rapid_launch:
     root.update()
+
+if rapid_launch:
+    launch_bot()
 
 while is_botting and not should_quit:
     try:
@@ -209,6 +214,7 @@ while is_botting and not should_quit:
                 try:
                     sleep(0.25)
                     buzzbtn.click()
+
                 except:
                     print('buzz failed')
 
