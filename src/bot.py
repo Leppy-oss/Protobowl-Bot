@@ -212,7 +212,7 @@ while is_botting and not should_quit:
                     pass
 
                 try:
-                    sleep(0.25)
+                    sleep(0.1)
                     buzzbtn.click()
 
                 except:
