@@ -48,7 +48,7 @@ def launch_bot():
     global is_botting, driver, buzzbtn, nextbtn, skipbtn, nameInput, roomInput
     if not is_botting:
         is_botting = True
-        driver = webdriver.Chrome()
+        driver = webdriver.Chrome(r'c:\Program Files (x86)\chromedriver-win64\chromedriver.exe')
         driver.get('https://protobowl.com/' +
                    (str(roomInput.get(1.0, 'end-1c')) if not rapid_launch else 'msquizbowl'))
         while not driver.find_element(By.ID, 'username').is_displayed():
@@ -250,5 +250,5 @@ while is_botting and not should_quit:
         # print('bot operation failed: ' + str(e))
         pass
 
-    root.update()
+    # root.update()
     # sleep(0.2)
