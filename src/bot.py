@@ -195,7 +195,7 @@ def get_annotations(i):
 knowledge = {}
 try:
     print(os.getcwd())
-    with open("../res/knowledge.json", "r") as f:
+    with open("./res/knowledge.json", "r") as f:
         knowledge = json.load(f)
 except Exception as e:
     print(str(e))
@@ -290,7 +290,7 @@ while is_botting and not should_quit:
             except Exception as e:
                 print("error while trying to save knowledge: " + str(e))
 
-            write_out("../res/knowledge.json")
+            write_out("./res/knowledge.json")
             print("knowledge now contains " + str(len(knowledge)) + " pairs")
 
         prevqid = got_knowledge["qid"]
