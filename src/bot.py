@@ -246,7 +246,7 @@ while is_botting and not should_quit:
                 pass
 
             try:
-                sleep(0.15)
+                sleep(0.25)
                 buzzbtn.click()
 
             except:
@@ -298,5 +298,5 @@ while is_botting and not should_quit:
         # print('bot operation failed: ' + str(e))
         pass
 
-    root.update()
+    # root.update()
     # sleep(0.2)
