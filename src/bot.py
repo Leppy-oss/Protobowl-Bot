@@ -18,10 +18,10 @@ from tkinter import *
 
 driver = None
 
-name = ''
+name = ""
 root = tk.Tk()
-root.title('Protobowl Bot Interface')
-root.geometry('400x400')
+root.title("Protobowl Bot Interface")
+root.geometry("400x400")
 
 buzzbtn = None
 nextbtn = None
@@ -32,15 +32,16 @@ should_quit = False
 rapid_launch = True
 
 caption = Label(
-    root, text='Welcome to Protobowl Bot! Pardon the primitive UI, it\'s still a WIP...')
+    root, text="Welcome to Protobowl Bot! Pardon the primitive UI, it's still a WIP..."
+)
 caption.pack()
 nameInput = tk.Text(root, height=1, width=10)
-tk.Label(root, text='Enter bot name here...').pack()
+tk.Label(root, text="Enter bot name here...").pack()
 nameInput.pack()
-tk.Label(root, text='Enter room name here...').pack()
+tk.Label(root, text="Enter room name here...").pack()
 roomInput = tk.Text(root, height=1, width=10)
 roomInput.pack()
-stop_label = tk.Label(root, text='Stopping...')
+stop_label = tk.Label(root, text="Stopping...")
 should_natural = True
 
 
@@ -49,23 +50,34 @@ def launch_bot():
     if not is_botting:
         is_botting = True
         driver = webdriver.Chrome()
-        driver.get('https://protobowl.com/' +
-                   (str(roomInput.get(1.0, 'end-1c')) if not rapid_launch else 'msquizbowl'))
-        while not driver.find_element(By.ID, 'username').is_displayed():
-            sleep(.1)  # wait for the page to load
+        driver.get(
+            "https://protobowl.com/"
+            + (str(roomInput.get(1.0, "end-1c")) if not rapid_launch else "msquizbowl")
+        )
+        while not driver.find_element(By.ID, "username").is_displayed():
+            sleep(0.1)  # wait for the page to load
 
-        username = driver.find_element(By.ID, 'username')
+        username = driver.find_element(By.ID, "username")
         username.clear()
-        username.send_keys((str(nameInput.get(1.0, 'end-1c'))
-                           if not rapid_launch else 'natty bot') + Keys.RETURN)
+        username.send_keys(
+            (
+                str(nameInput.get(1.0, "end-1c"))
+                if not rapid_launch
+                else "natty bot v4.0"
+            )
+            + Keys.RETURN
+        )
 
         # initialize buttons
-        buzzbtn = Click(driver.find_element(
-            By.CLASS_NAME, 'buzzbtn')).bind_driver(driver)
-        nextbtn = Click(driver.find_element(
-            By.CLASS_NAME, 'nextbtn')).bind_driver(driver)
-        skipbtn = Click(driver.find_element(
-            By.CLASS_NAME, 'skipbtn')).bind_driver(driver)
+        buzzbtn = Click(driver.find_element(By.CLASS_NAME, "buzzbtn")).bind_driver(
+            driver
+        )
+        nextbtn = Click(driver.find_element(By.CLASS_NAME, "nextbtn")).bind_driver(
+            driver
+        )
+        skipbtn = Click(driver.find_element(By.CLASS_NAME, "skipbtn")).bind_driver(
+            driver
+        )
 
 
 def stop_bot():
@@ -79,20 +91,20 @@ def stop_bot():
     quit()
 
 
-start_btn = Button(root, text='LAUNCH BOT', command=launch_bot)
+start_btn = Button(root, text="LAUNCH BOT", command=launch_bot)
 start_btn.pack()
-stop_btn = Button(root, text='STOP BOT', command=stop_bot)
+stop_btn = Button(root, text="STOP BOT", command=stop_bot)
 stop_btn.pack()
 
 
 def buzz(guess):
-    guess_input = driver.find_element(By.CLASS_NAME, 'guess_input')
-    print('Buzzing')
+    guess_input = driver.find_element(By.CLASS_NAME, "guess_input")
+    print("Buzzing")
 
-    '''
+    """
     while not (guess_input.is_displayed()):
         print('waiting for the text field to become available')
-    '''
+    """
 
     if should_natural:
         # natural delay before typing
@@ -105,14 +117,14 @@ def buzz(guess):
     if should_natural:
         splits = natural.naturalized_splits(guess)
         start_time = time.time()
-        print('initialized splits')
+        print("initialized splits")
         for split in splits:
             type_successful = False
             try:
                 guess_input.send_keys(split[0])
             except:
                 continue
-            '''
+            """
             while not type_successful:
                 if time.time() - start_time > 5:
                     break
@@ -120,14 +132,14 @@ def buzz(guess):
                     type_successful = True
                 except:
                     continue
-            '''
+            """
 
             sleep(split[1])
     else:
         type_successful = False
-        print('oloop prev')
+        print("oloop prev")
         while not type_successful:
-            print('oloop ')
+            print("oloop ")
             try:
                 buzzbtn.click()
                 guess_input.send_keys(guess)
@@ -137,38 +149,58 @@ def buzz(guess):
                 continue
 
     try:
-        guess_input.send_keys('\n')
+        guess_input.send_keys("\n")
     except:
         pass
 
 
 def get_knowledge(i):
-    bundle = driver.find_elements(By.CLASS_NAME, 'bundle')[i]
+    bundle = driver.find_elements(By.CLASS_NAME, "bundle")[i]
     qid = bundle.get_attribute("class").split("qid-")[1].split(" ")[0]
     if i > 0:  # only return a non-empty answer if it is a past question
-        raw_breadcrumb = bundle.find_element(By.CLASS_NAME, 'breadcrumb').text
+        raw_breadcrumb = bundle.find_element(By.CLASS_NAME, "breadcrumb").text
         answer = raw_breadcrumb.split("/Edit\n")[1]
-        answer = unicodedata.normalize(
-            'NFKD', answer).encode("ascii", "ignore").decode()
+        answer = (
+            unicodedata.normalize("NFKD", answer).encode("ascii", "ignore").decode()
+        )
 
         # remove the parenthesised part of the answer
         answer = answer.split("(")[0]
         answer = answer.split("[")[0]
         answer = answer.strip()
     else:
-        answer = ''
-    return {'qid': qid, 'answer': answer}
+        answer = ""
+    return {"qid": qid, "answer": answer}
+
+
+def get_annotations(i):
+    bundle = driver.find_elements(By.CLASS_NAME, "log")[i]
+    qid = bundle.get_attribute("class").split("qid-")[1].split(" ")[0]
+    if i > 0:  # only return a non-empty answer if it is a past question
+        raw_breadcrumb = bundle.find_element(By.CLASS_NAME, "breadcrumb").text
+        answer = raw_breadcrumb.split("/Edit\n")[1]
+        answer = (
+            unicodedata.normalize("NFKD", answer).encode("ascii", "ignore").decode()
+        )
+
+        # remove the parenthesised part of the answer
+        answer = answer.split("(")[0]
+        answer = answer.split("[")[0]
+        answer = answer.strip()
+    else:
+        answer = ""
+    return {"qid": qid, "answer": answer}
 
 
 knowledge = {}
 try:
-    with open('../res/knowledge.json', 'r') as f:
+    with open("./res/knowledge.json", "r") as f:
         knowledge = json.load(f)
 except Exception as e:
     print(str(e))
 
 initial_knowledge_length = len(knowledge)
-print("knowledge currently consists of "+str(len(knowledge))+" pairs.")
+print("knowledge currently consists of " + str(len(knowledge)) + " pairs.")
 
 
 def guess_answer(qid) -> str:
@@ -182,17 +214,20 @@ def record_answer(qid, answer):
 
 
 def write_out(filename, object=knowledge):
-    with open(filename, 'w') as f:
+    with open(filename, "w") as f:
         json.dump(object, f, sort_keys=True)
 
 
-prevqid = ''
+prevqid = ""
 
 while not is_botting and not should_quit and not rapid_launch:
     root.update()
 
 if rapid_launch:
     launch_bot()
+
+should_buzz = True
+tried_buzzing = False
 
 while is_botting and not should_quit:
     try:
@@ -202,49 +237,62 @@ while is_botting and not should_quit:
         except:
             pass
         got_knowledge = get_knowledge(0)
-        if got_knowledge['qid'] != prevqid:
-            print('new question occurred')
-            guess: str = guess_answer(got_knowledge['qid'])
-            print(guess)
-            if guess != '':
+        should_buzz = buzzbtn.should_run()  # and not tried_buzzing
+        guess: str = guess_answer(got_knowledge["qid"])
+        if guess != "" and should_buzz:
+            bozh = False
+            if should_natural:
+                # sleep(random.randint(500, 1000) / 1000 * 0.5)
+                pass
+
+            try:
+                sleep(0.15)
+                buzzbtn.click()
+
+            except:
+                print("buzz failed")
+
+            try:
                 if should_natural:
-                    # sleep(random.randint(500, 1000) / 1000 * 0.5)
-                    pass
+                    sleep(random.randint(500, 1000) / 1000 * 0.15)
 
-                try:
-                    sleep(0.25)
-                    buzzbtn.click()
+                buzz(guess.lower())
+                tried_buzzing = True
 
-                except:
-                    print('buzz failed')
+                """
+                    natural.naturalize_guess(guess.lower().replace('-', ' ').translate(
+                    str.maketrans('', '', string.punctuation))) if should_natural else guess.lower().replace('-', ' ').translate(
+                    str.maketrans('', '', string.punctuation)))
+                """
+            except Exception as e:
+                print("guess failed: " + str(e))
 
-                try:
-                    if should_natural:
-                        sleep(random.randint(500, 1000) / 1000 * 1.5)
-
-                    buzz(natural.naturalize_guess(guess.lower().replace('-', ' ').translate(
-                        str.maketrans('', '', string.punctuation))) if should_natural else guess.lower().replace('-', ' ').translate(
-                        str.maketrans('', '', string.punctuation)))
-                except Exception as e:
-                    print('guess failed: ' + str(e))
+        if got_knowledge["qid"] != prevqid:
+            tried_buzzing = False
+            print("new question occurred")
+            guess: str = guess_answer(got_knowledge["qid"])
+            print(guess)
+            if guess != "":
+                pass
             else:
                 try:
-                    sleep(0.5)
-                    skipbtn.click()
-                    print('attempted to skip')
+                    # sleep(0.5)
+                    # skipbtn.click()
+                    print("attempted to skip")
                 except Exception as e:
-                    print('couldnt skip rip: ' + str(e))
+                    print("couldnt skip rip: " + str(e))
 
             try:
                 a = get_knowledge(1)
-                record_answer(a['qid'], a['answer'])
-                print('answer to previous question: ' + a['answer'])
+                record_answer(a["qid"], a["answer"])
+                print("answer to previous question: " + a["answer"])
             except Exception as e:
-                print('error while trying to save knowledge: ' + str(e))
+                print("error while trying to save knowledge: " + str(e))
 
-            write_out('../res/knowledge.json')
-            print('knowledge now contains ' + str(len(knowledge)) + ' pairs')
-        prevqid = got_knowledge['qid']
+            write_out("../res/knowledge.json")
+            print("knowledge now contains " + str(len(knowledge)) + " pairs")
+
+        prevqid = got_knowledge["qid"]
 
     except Exception as e:
         # print('bot operation failed: ' + str(e))

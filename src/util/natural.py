@@ -53,7 +53,7 @@ def naturalized_splits(guess: str) -> list:
     splits = []  # tuple of words + delay
     for chunk in chunks:
         splits.append((chunk, gaussian_rand(
-            len(chunk) / cpm * 60, 0.2, min=0)))
+            len(chunk) / cpm * 60, 0.05, min=0)))
 
     return splits
 
