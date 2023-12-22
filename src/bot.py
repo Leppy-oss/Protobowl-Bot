@@ -1,6 +1,6 @@
 import json
 import unicodedata
-import selenium
+import os
 from selenium import webdriver
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -194,7 +194,8 @@ def get_annotations(i):
 
 knowledge = {}
 try:
-    with open("./res/knowledge.json", "r") as f:
+    print(os.getcwd())
+    with open("../res/knowledge.json", "r") as f:
         knowledge = json.load(f)
 except Exception as e:
     print(str(e))
@@ -254,7 +255,7 @@ while is_botting and not should_quit:
 
             try:
                 if should_natural:
-                    sleep(random.randint(500, 1000) / 1000 * 0.15)
+                    sleep(random.randint(1000, 2000) / 1000 * 0.15)
 
                 buzz(guess.lower())
                 tried_buzzing = True
@@ -298,5 +299,5 @@ while is_botting and not should_quit:
         # print('bot operation failed: ' + str(e))
         pass
 
-    # root.update()
+    root.update()
     # sleep(0.2)
