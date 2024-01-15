@@ -52,7 +52,7 @@ def launch_bot():
         driver = webdriver.Chrome()
         driver.get(
             "https://protobowl.com/"
-            + (str(roomInput.get(1.0, "end-1c")) if not rapid_launch else "msquizbowl")
+            + (str(roomInput.get(1.0, "end-1c")) if not rapid_launch else "hsquizbowl")
         )
         while not driver.find_element(By.ID, "username").is_displayed():
             sleep(0.1)  # wait for the page to load
