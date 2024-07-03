@@ -1,7 +1,6 @@
 # Protobowl Bot
 Protobowl bot is the **world's premiere bot** for systematically cracking away at [Protobowl](https://protobowl.com/)! <br>
-Because of the many fatal flaws that Protobowl was structured upon, it's actually *pretty easy to cheat*. <br>
-Protobowl bot will automatically buzz, answer, skip, and memorize all questions before any human player possibly can.
+It will automatically buzz, answer, skip, and memorize all questions before any human player possibly can.
 Simply put, it's a flawless program that can't be beat! It can run 24/7, even when you're afk, and rack up tens of thousands of points overnight! <br>
 Please note, however, that due to how goofy Protobowl is, the bot occasionally gets the question incorrect.
 For some reason, Protobowl doesn't always accept flawless answers...
@@ -27,9 +26,9 @@ which unfortunately no longer works. I promise that Protobowl bot will be mainta
 </ol>
 
 # NOTICE
-Will you get better at Quizbowl using this bot? *Probably not.* <br>
-Will you have fun using this bot? *Probably not.* <br>
-Will others get mad at you for using this bot? *Probably.* <br>
+Will you get better at Quizbowl using this bot? *NO.* <br>
+Will you have fun using this bot? *NO.* <br>
+Will others get mad at you for using this bot? *YES.* <br>
 **I made this bot as a side project in a day just for fun, not for any malicious intent. Please don't do anything immature or embarassing with this bot.**
 *I fully condemn any exploitative actions with this bot that harm anybody.* <br>
 ***USE THIS BOT AT YOUR OWN RISK!!!***
